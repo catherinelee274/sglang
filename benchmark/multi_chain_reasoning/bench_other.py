@@ -135,7 +135,8 @@ def main(args):
             states[i] = answer
 
         tic = time.perf_counter()
-        loop = asyncio.get_event_loop()
+        loop = asyncio.new_event_loop()
+        asyncio.set_event_loop(loop)
         batches = [
             list(range(i, min(i + args.parallel, len(questions))))
             for i in range(0, len(questions), args.parallel)
