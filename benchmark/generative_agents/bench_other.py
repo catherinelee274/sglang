@@ -47,7 +47,8 @@ def main(args):
     else:
         import asyncio
 
-        loop = asyncio.get_event_loop()
+        loop = asyncio.new_event_loop()
+        asyncio.set_event_loop(loop)
         for arg in tqdm(arguments):
             loop.run_until_complete(get_one_answer_async(arg))
     latency = time.perf_counter() - tic

@@ -389,7 +389,8 @@ class ServingChatTestCase(unittest.TestCase):
                     break
                 return line
 
-            loop = asyncio.get_event_loop()
+            loop = asyncio.new_event_loop()
+            asyncio.set_event_loop(loop)
             line = loop.run_until_complete(collect_first_tool_chunk())
             self.assertIsNotNone(line)
             self.assertTrue(line.startswith("data: "))
@@ -564,7 +565,8 @@ class ServingChatTestCase(unittest.TestCase):
                     break
                 return line
 
-            loop = asyncio.get_event_loop()
+            loop = asyncio.new_event_loop()
+            asyncio.set_event_loop(loop)
             line = loop.run_until_complete(collect_first_tool_chunk())
             self.assertIsNotNone(line)
             self.assertTrue(line.startswith("data: "))
