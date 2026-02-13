@@ -1,5 +1,6 @@
 import argparse
 import json
+import os
 import time
 
 from agent_functions import (
@@ -16,7 +17,10 @@ from sglang.utils import dump_state_text, read_jsonl
 
 
 def main(args):
-    lines = read_jsonl(args.data_path)[: args.num_events]
+    if not os.path.exists(args.data_path):
+        raise FileNotFoundError(f"Data file not found: {args.data_path}")
+    
+    lines = list(read_jsonl(args.data_path))[: args.num_events]
     mapping = {
         "poignancy_event": poignancy_event_prompt,
         "generate_event_triple": generate_event_triple_prompt,
@@ -25,7 +29,7 @@ def main(args):
         "action_location_object": action_location_object_prompt,
     }
 
-    arguments = [mapping[k](**v) for l in lines for k, v in l.items()]
+    arguments = [mapping[k](**v) for l in lines for k, v in l.items() if k in mapping]
     states = []
 
     # Select backend
@@ -47,8 +51,9 @@ def main(args):
     else:
         import asyncio
 
-        loop = asyncio.new_event_loop()
-        asyncio.set_event_loop(loop)
+        loop = asyncio.get_event_loop()
+        # loop = asyncio.new_event_loop()
+        # asyncio.set_event_loop(loop)
         for arg in tqdm(arguments):
             loop.run_until_complete(get_one_answer_async(arg))
     latency = time.perf_counter() - tic
